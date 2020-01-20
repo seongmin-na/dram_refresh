@@ -1,0 +1,6 @@
+20:03:15 **** Incremental Build of configuration Debug for project memory_test ****
+make all 
+make: Nothing to be done for 'all'.
+
+20:03:15 Build Finished (took 149ms)
+
