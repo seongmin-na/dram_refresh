@@ -7,16 +7,19 @@ LD_SRCS += \
 ../src/lscript.ld 
 
 C_SRCS += \
+../src/AxiTimerHelper.c \
 ../src/memory_config_g.c \
 ../src/memorytest.c \
 ../src/platform.c 
 
 OBJS += \
+./src/AxiTimerHelper.o \
 ./src/memory_config_g.o \
 ./src/memorytest.o \
 ./src/platform.o 
 
 C_DEPS += \
+./src/AxiTimerHelper.d \
 ./src/memory_config_g.d \
 ./src/memorytest.d \
 ./src/platform.d 

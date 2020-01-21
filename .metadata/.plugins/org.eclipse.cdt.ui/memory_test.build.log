@@ -1,6 +1,34 @@
-20:03:15 **** Incremental Build of configuration Debug for project memory_test ****
+15:04:27 **** Auto Build of configuration Debug for project memory_test ****
 make all 
-make: Nothing to be done for 'all'.
+'Building file: ../src/memorytest.c'
+'Invoking: MicroBlaze gcc compiler'
+mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/memorytest.o" -I../../memory_test_bsp/microblaze_0/include -mlittle-endian -mcpu=v9.5 -mxl-soft-mul -Wl,--no-relax -ffunction-sections -fdata-sections -MMD -MP -MF"src/memorytest.d" -MT"src/memorytest.o" -o "src/memorytest.o" "../src/memorytest.c"
+../src/memorytest.c: In function 'test_memory_range':
+../src/memorytest.c:108:6: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+      if(round == 0)
+      ^~
+../src/memorytest.c:112:3: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   for(disable_time = initial_disable_time; disable_time <= final_disable_time; )
+   ^~~
+../src/memorytest.c:105:9: warning: unused variable 'seed' [-Wunused-variable]
+     u32 seed = 0;
+         ^~~~
+../src/memorytest.c:90:5: warning: unused variable 'pattern' [-Wunused-variable]
+  u8 pattern;
+     ^~~~~~~
+'Finished building: ../src/memorytest.c'
+' '
+'Building target: memory_test.elf'
+'Invoking: MicroBlaze gcc linker'
+mb-gcc -Wl,-T -Wl,../src/lscript.ld -L../../memory_test_bsp/microblaze_0/lib -mlittle-endian -mcpu=v9.5 -mxl-soft-mul -Wl,--no-relax -Wl,--gc-sections -o "memory_test.elf"  ./src/AxiTimerHelper.o ./src/memory_config_g.o ./src/memorytest.o ./src/platform.o   -Wl,--start-group,-lxil,-lgcc,-lc,--end-group
+'Finished building target: memory_test.elf'
+' '
+'Invoking: MicroBlaze Print Size'
+mb-size memory_test.elf  |tee "memory_test.elf.size"
+   text	   data	    bss	    dec	    hex	filename
+ 100029	   1756	   1135	 102920	  19208	memory_test.elf
+'Finished building: memory_test.elf.size'
+' '
 
-20:03:15 Build Finished (took 149ms)
+15:04:28 Build Finished (took 553ms)
 

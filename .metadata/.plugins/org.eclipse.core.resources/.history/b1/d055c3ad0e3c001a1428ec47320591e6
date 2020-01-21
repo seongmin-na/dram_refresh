@@ -1,0 +1,13 @@
+/*
+ * sm_testmem.h
+ *
+ *  Created on: 2020. 1. 21.
+ *      Author: Seongmin
+ */
+
+#ifndef MICROBLAZE_0_INCLUDE_SM_TESTMEM_H_
+#define MICROBLAZE_0_INCLUDE_SM_TESTMEM_H_
+
+
+
+#endif /* MICROBLAZE_0_INCLUDE_SM_TESTMEM_H_ */

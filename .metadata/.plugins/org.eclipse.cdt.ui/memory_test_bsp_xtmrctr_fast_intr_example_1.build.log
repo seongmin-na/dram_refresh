@@ -1,0 +1,22 @@
+14:16:12 **** Build of configuration Debug for project memory_test_bsp_xtmrctr_fast_intr_example_1 ****
+make all 
+'Building file: ../src/xtmrctr_fast_intr_example.c'
+'Invoking: MicroBlaze gcc compiler'
+mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/xtmrctr_fast_intr_example.o" -I../../memory_test_bsp/microblaze_0/include -mlittle-endian -mcpu=v9.5 -mxl-soft-mul -Wl,--no-relax -ffunction-sections -fdata-sections -MMD -MP -MF"src/xtmrctr_fast_intr_example.d" -MT"src/xtmrctr_fast_intr_example.o" -o "src/xtmrctr_fast_intr_example.o" "../src/xtmrctr_fast_intr_example.c"
+../src/xtmrctr_fast_intr_example.c: In function 'main':
+../src/xtmrctr_fast_intr_example.c:73:29: error: 'XPAR_INTC_0_TMRCTR_0_VEC_ID' undeclared (first use in this function); did you mean 'XPAR_INTC_0_UARTLITE_0_VEC_ID'?
+ #define TMRCTR_INTERRUPT_ID XPAR_INTC_0_TMRCTR_0_VEC_ID
+                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+../src/xtmrctr_fast_intr_example.c:153:7: note: in expansion of macro 'TMRCTR_INTERRUPT_ID'
+       TMRCTR_INTERRUPT_ID,
+       ^~~~~~~~~~~~~~~~~~~
+../src/xtmrctr_fast_intr_example.c:73:29: note: each undeclared identifier is reported only once for each function it appears in
+ #define TMRCTR_INTERRUPT_ID XPAR_INTC_0_TMRCTR_0_VEC_ID
+                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+../src/xtmrctr_fast_intr_example.c:153:7: note: in expansion of macro 'TMRCTR_INTERRUPT_ID'
+       TMRCTR_INTERRUPT_ID,
+       ^~~~~~~~~~~~~~~~~~~
+make: *** [src/subdir.mk:23: src/xtmrctr_fast_intr_example.o] Error 1
+
+14:16:12 Build Finished (took 253ms)
+

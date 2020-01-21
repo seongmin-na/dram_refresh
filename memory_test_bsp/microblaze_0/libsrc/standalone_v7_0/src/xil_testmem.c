@@ -43,12 +43,23 @@
 *****************************************************************************/
 
 /***************************** Include Files ********************************/
-#include "xil_testmem.h"
+#include "ik_testmem.h"
 #include "xil_io.h"
 #include "xil_assert.h"
+#include "microblaze_sleep.h"
+#include "AxiTimerHelper.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 /************************** Constant Definitions ****************************/
 /************************** Function Prototypes *****************************/
+
+#define XPAR_AXI_TIMER_DEVICE_ID 		(XPAR_AXI_TIMER_0_DEVICE_ID) // Vivado 2015.2.1
+
+// TIMER Instance
+XTmrCtr timer_dev;
+
+
 
 static u32 RotateLeft(u32 Input, u8 Width);
 
@@ -86,6 +97,404 @@ static u32 RotateRight(u32 Input, u8 Width);
 * patterns used not to repeat over the region tested.
 *
 *****************************************************************************/
+u64 countOnes64(u64 num)
+{
+	u32 ret = 0;
+	u64 one = 0x0000000000000001;
+	u32 I;
+	for(I = 0; I < 64; I++)
+	{
+		if(one & num)
+			ret++;
+		num = num >> 1;
+	}
+
+	return ret;
+}
+
+u32 countOnes32(u32 num)
+{
+	u32 ret = 0;
+	u32 one = 0x00000001;
+	u32 I;
+	for(I = 0; I < 32; I++)
+	{
+		if(one & num)
+			ret++;
+		num = num >> 1;
+	}
+
+	return ret;
+}
+
+u32 countZeros32(u32 num)
+{
+	u32 ret = 0;
+	u32 inv_num = ~num;
+	//print("num: 0x"); putnum((unsigned)num); print("\n\r");
+	//print("inv_num: 0x"); putnum((unsigned)inv_num); print("\n\r");
+	u32 one = 0x00000001;
+	u32 I;
+	for(I = 0; I < 32; I++)
+	{
+		if(one & inv_num)
+			ret++;
+		inv_num = inv_num >> 1;
+	}
+
+	return ret;
+}
+
+u32 countOnes8(u8 num)
+{
+	u32 ret = 0;
+	u8 one = 0x01;
+	u32 I;
+	for(I = 0; I < 8; I++)
+	{
+		if(one & num)
+			ret++;
+		num = num >> 1;
+	}
+	return ret;
+}
+
+
+u64 refresh_disable(u32 buffer_ms, u32 wait_ms, AxiTimerHelper* timer)
+{
+
+	unsigned disable_base = 0x44A00000;
+	u32* base_ptr = (u32*)disable_base;
+
+	u64 disabled_ms = 0;
+	u32 wait_ms_temp = wait_ms;
+
+	MB_Sleep(buffer_ms);
+	*(base_ptr) = 1U;
+
+	while(wait_ms_temp > 30*1000)
+	{
+		startTimer(timer);
+		MB_Sleep(30*1000);
+		wait_ms_temp -= 30*1000;
+		stopTimer(timer);
+		disabled_ms += getElapsedTimerInMiliSeconds(timer);
+	}
+
+	startTimer(timer);
+	MB_Sleep(wait_ms_temp);
+	stopTimer(timer);
+	disabled_ms += getElapsedTimerInMiliSeconds(timer);
+
+
+	*(base_ptr) = 0U;
+	MB_Sleep(buffer_ms);
+
+	return disabled_ms;
+}
+
+
+unsigned long int IK_ValidateMem8(u8 *Addr, u32 Words, u8 Pattern, u8 Subtest, u32 Wait_ms)
+{
+	u32 I;
+	u32 j;
+	u8 Val;
+	u8 FirtVal;
+	u8 WordMem8;
+	unsigned long int Fail_bitCount;
+	unsigned long int Fail_byteCount;
+
+	Xil_AssertNonvoid(Words != (u32)0);
+	Xil_AssertNonvoid(Subtest <= XIL_TESTMEM_MAXTEST);
+	Xil_AssertNonvoid(Addr != NULL);
+
+	/*
+	 * variable initialization
+	 */
+	Val = XIL_TESTMEM_INIT_VALUE;
+	FirtVal = XIL_TESTMEM_INIT_VALUE;
+
+	/*
+	 * select the proper Subtest(s)
+	 */
+
+	MB_Sleep(Wait_ms);
+
+	// Test All 1s
+	if(Subtest == XIL_TESTMEM_ALL1) {
+		Fail_bitCount = 0;
+		Fail_byteCount = 0;
+		/*
+		 * Fill the memory with incrementing
+		 * values starting from 'FirtVal'
+		 */
+
+		for (I = 0U; I < Words; I++) {
+			/* read memory location */
+			Val = 0xff;
+			WordMem8 = *(Addr+I);
+
+
+			if (WordMem8 != Val) {
+				u8 res_xor = Val ^ WordMem8;
+				//print("Value: 0x"); putnum((unsigned)Val); print("\n\r");
+				//print("WordMem8: 0x"); putnum((unsigned)WordMem8); print("\n\r");
+				//print("res_xor: 0x"); putnum((unsigned)res_xor); print("\n\r");
+				//print("countOnes8: 0x"); putnum((unsigned)countOnes8(res_xor)); print("\n\r");
+
+				Fail_bitCount += countOnes8(res_xor);
+				Fail_byteCount++;
+			}
+		}
+
+		return Fail_bitCount;
+	}
+
+	// Test All 0s
+	if(Subtest == XIL_TESTMEM_ALL0) {
+		Fail_bitCount = 0;
+		Fail_byteCount = 0;
+
+		for (I = 0U; I < Words; I++) {
+			/* read memory location */
+			Val = 0x00;
+			WordMem8 = *(Addr+I);
+
+
+			if (WordMem8 != Val) {
+				u8 res_xor = Val ^ WordMem8;
+
+				//print("Value: 0x"); putnum((unsigned)Val); print("\n\r");
+				//print("WordMem8: 0x"); putnum((unsigned)WordMem8); print("\n\r");
+				//print("res_xor: 0x"); putnum((unsigned)res_xor); print("\n\r");
+				//print("countOnes8: 0x"); putnum((unsigned)countOnes8(res_xor)); print("\n\r");
+
+				Fail_bitCount += countOnes8(res_xor);
+				Fail_byteCount++;
+			}
+		}
+
+		return Fail_bitCount;
+	}
+}
+
+void IK_TestMem32(u32 *Addr, u32 Words, u8 Pattern, u8 Subtest, u32 Wait_ms, u32 round)
+{
+	u32 I;
+	u32 j;
+	u32 Val;
+	u32 FirtVal;
+	u32 WordMem32;
+	u64 Fail_bitCount;
+	u64 Unfail_bitCount;
+
+	Xil_AssertNonvoid(Words != (u32)0);
+	Xil_AssertNonvoid(Subtest <= XIL_TESTMEM_MAXTEST);
+	Xil_AssertNonvoid(Addr != NULL);
+
+
+	AxiTimerHelper timer;
+	timerInitialize(&timer);
+	u64 disabled_ms;
+
+	/*
+	 * variable initialization
+	 */
+	Val = XIL_TESTMEM_INIT_VALUE;
+	FirtVal = XIL_TESTMEM_INIT_VALUE;
+
+	/*
+	 * select the proper Subtest(s)
+	 */
+
+	// Test All 1s
+	if(Subtest == XIL_TESTMEM_ALL1) {
+		Fail_bitCount = 0;
+		Unfail_bitCount = 0;
+		/*
+		 * Fill the memory with incrementing
+		 * values starting from 'FirtVal'
+		 */
+		for (I = 0U; I < Words; I++) {
+			/* write memory location */
+			Val = 0xffffffff;
+			*(Addr+I) = Val;
+		}
+		/*
+		 * Restore the reference 'Val' to the
+		 * initial value
+		 */
+		Val = FirtVal;
+		/*
+		 * Check every word within the words
+		 * of tested memory and compare it
+		 * with the incrementing reference
+		 * Val
+		 */
+
+		disabled_ms = refresh_disable(1000, Wait_ms, &timer);
+
+		for (I = 0U; I < Words; I++) {
+			/* read memory location */
+			Val = 0xffffffff;
+			WordMem32 = *(Addr+I);
+
+			u32 res_xor = Val ^ WordMem32;
+			if (WordMem32 != Val) {
+				//print("Value: 0x"); putnum((unsigned)Val); print("\n\r");
+				//print("WordMem32: 0x"); putnum((unsigned)WordMem32); print("\n\r");
+				//print("res_xor: 0x"); putnum((unsigned)res_xor); print("\n\r");
+				//print("countOnes32: 0x"); putnum((unsigned)countOnes32(res_xor)); print("\n\r");
+				u32 temp_fail = countOnes32(res_xor);
+				Fail_bitCount += temp_fail;
+				//Unfail_bitCount += (32 - temp_fail);
+			}
+			//else
+				//Unfail_bitCount += countZeros32(res_xor);
+		}
+	}
+
+
+	/*
+	// Test All 0s
+	if(Subtest == XIL_TESTMEM_ALL0) {
+		Fail_bitCount = 0;
+
+		for (I = 0U; I < Words; I++) {
+			Val = 0x00000000;
+			*(Addr+I) = Val;
+		}
+
+		Val = FirtVal;
+
+
+		refresh_disable(1000, Wait_ms, &timer);
+
+		for (I = 0U; I < Words; I++) {
+			Val = 0x00000000;
+			WordMem32 = *(Addr+I);
+
+
+			if (WordMem32 != Val) {
+				u32 res_xor = Val ^ WordMem32;
+
+				//print("Value: 0x"); putnum((unsigned)Val); print("\n\r");
+				//print("WordMem32: 0x"); putnum((unsigned)WordMem32); print("\n\r");
+				//print("res_xor: 0x"); putnum((unsigned)res_xor); print("\n\r");
+				//print("countOnes32: 0x"); putnum((unsigned)countOnes32(res_xor)); print("\n\r");
+
+				Fail_bitCount += countOnes32(res_xor);
+			}
+		}
+	}
+	*/
+
+}
+void IK_TestMem64_FailCount(u64 *Addr, u32 Words, u8 Subtest, u64 Wait_ms, retentionTestResult* result)
+{
+	u32 I;
+	u32 j;
+	u64 Val;
+	u64 FirstVal;
+	u64 WordMem64;
+	u64 FailCount = 0;
+
+	Xil_AssertNonvoid(Words != (u32)0);
+	Xil_AssertNonvoid(Subtest <= XIL_TESTMEM_MAXTEST);
+	Xil_AssertNonvoid(Addr != NULL);
+
+
+	AxiTimerHelper timer;
+	timerInitialize(&timer);
+	u64 disabled_ms;
+
+	/*
+	 * variable initialization
+	 */
+	Val = XIL_TESTMEM_INIT_VALUE;
+	FirstVal = XIL_TESTMEM_INIT_VALUE;
+
+	/*
+	 * select the proper Subtest(s)
+	 */
+
+	// Test All 1s
+	if(Subtest == XIL_TESTMEM_ALL1) {
+		/*
+		 * Fill the memory with incrementing
+		 * values starting from 'FirtVal'
+		 */
+		//printf("here\n");
+		for (I = 0U; I < Words; I++) {
+			/* write memory location */
+			Val = 0xffffffffffffffff;
+			*(Addr+I) = Val;
+		}
+
+		disabled_ms = refresh_disable(1000, Wait_ms, &timer);
+
+		for (I = 0U; I < Words; I++) {
+			/* read memory location */
+			Val = 0xffffffffffffffff;
+			WordMem64 = *(Addr+I);
+
+			//printf("%u, %u, %x, %llx, %llx, %llu\n", (unsigned)round, (unsigned)Subtest, (unsigned)I, (unsigned long long)Val, (unsigned long long)WordMem64, (unsigned long long)disabled_ms);
+
+			if (WordMem64 != Val) {
+				u64 res_xor = WordMem64 ^ Val;
+				u64 temp = countOnes64(res_xor);
+				FailCount += temp;
+				// print: round_num, pattern, 64bit_word_num, ref_val, read_val, disabled_time
+				//printf("%u, %u, %.8x, %.16llx, %.16llx, %llu\n", (unsigned)round, (unsigned)Subtest, (unsigned)I, (unsigned long long)Val, (unsigned long long)WordMem64, (unsigned long long)disabled_ms);
+			}
+		}
+
+		result->disabled_ms = disabled_ms;
+		result->failed_bit_count = FailCount;
+
+		return;
+	}
+
+	if(Subtest == XIL_TESTMEM_WALK1)
+	{
+		// round < 8
+		//FirstVal = (0x0101010101010101) << round;
+		FirstVal = (0x0101010101010101);
+		Val = FirstVal;
+
+		for (I = 0U; I < Words; I++) {
+			*(Addr+I) = Val;
+			if(Val & 0x8000000000000000)
+				Val = (Val << 1) + 1;
+			else
+				Val = Val << 1;
+		}
+//		printf("enter refresh_disable");
+		disabled_ms = refresh_disable(1000, Wait_ms, &timer);
+//		printf("exit refresh_diable");
+		Val = FirstVal;
+		for (I = 0U; I < Words; I++) {
+			WordMem64 = *(Addr+I);
+			if (WordMem64 != Val) {
+				u64 res_xor = WordMem64 ^ Val;
+				u64 temp = countOnes64(res_xor);
+				FailCount += temp;				// print: round_num, pattern, 64bit_word_num, ref_val, read_val, disabled_time
+				//printf("%u, %u, %.8x, %.16llx, %.16llx, %llu\n", (unsigned)round, (unsigned)Subtest, (unsigned)I, (unsigned long long)Val, (unsigned long long)WordMem64, (unsigned long long)disabled_ms);
+			}
+
+			if(Val & 0x8000000000000000)
+				Val = (Val << 1) + 1;
+			else
+				Val = Val << 1;
+		}
+
+		result->disabled_ms = disabled_ms;
+		result->failed_bit_count = FailCount;
+
+		return;
+	}
+}
+
 s32 Xil_TestMem32(u32 *Addr, u32 Words, u32 Pattern, u8 Subtest)
 {
 	u32 I;

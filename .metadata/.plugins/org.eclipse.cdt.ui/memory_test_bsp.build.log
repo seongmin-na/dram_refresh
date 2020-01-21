@@ -1,4 +1,4 @@
-20:01:50 **** Build of project memory_test_bsp ****
+15:03:00 **** Auto Build of project memory_test_bsp ****
 make -k all 
 "Running Make include in microblaze_0/libsrc/bram_v4_3/src"
 make -C microblaze_0/libsrc/bram_v4_3/src -s include  "SHELL=CMD" "COMPILER=mb-gcc" "ARCHIVER=mb-ar" "COMPILER_FLAGS=  -O2 -c -mcpu=v9.5 -mlittle-endian -mxl-soft-mul" "EXTRA_COMPILER_FLAGS=-ffunction-sections -fdata-sections -Wall -Wextra"
@@ -17,7 +17,6 @@ make -C microblaze_0/libsrc/uartlite_v3_2/src -s include  "SHELL=CMD" "COMPILER=
 "Running Make libs in microblaze_0/libsrc/bram_v4_3/src"
 make -C microblaze_0/libsrc/bram_v4_3/src -s libs  "SHELL=CMD" "COMPILER=mb-gcc" "ARCHIVER=mb-ar" "COMPILER_FLAGS=  -O2 -c -mcpu=v9.5 -mlittle-endian -mxl-soft-mul" "EXTRA_COMPILER_FLAGS=-ffunction-sections -fdata-sections -Wall -Wextra"
 "Compiling bram"
-mb-ar: creating ../../../lib/libxil.a
 "Running Make libs in microblaze_0/libsrc/cpu_v2_9/src"
 make -C microblaze_0/libsrc/cpu_v2_9/src -s libs  "SHELL=CMD" "COMPILER=mb-gcc" "ARCHIVER=mb-ar" "COMPILER_FLAGS=  -O2 -c -mcpu=v9.5 -mlittle-endian -mxl-soft-mul" "EXTRA_COMPILER_FLAGS=-ffunction-sections -fdata-sections -Wall -Wextra"
 "Compiling cpu"
@@ -37,6 +36,148 @@ make -C microblaze_0/libsrc/intc_v3_9/src -s libs  "SHELL=CMD" "COMPILER=mb-gcc"
 "Running Make libs in microblaze_0/libsrc/standalone_v7_0/src"
 make -C microblaze_0/libsrc/standalone_v7_0/src -s libs  "SHELL=CMD" "COMPILER=mb-gcc" "ARCHIVER=mb-ar" "COMPILER_FLAGS=  -O2 -c -mcpu=v9.5 -mlittle-endian -mxl-soft-mul" "EXTRA_COMPILER_FLAGS=-ffunction-sections -fdata-sections -Wall -Wextra"
 "Compiling standalone";
+xil_testmem.c: In function 'refresh_disable':
+xil_testmem.c:172:2: warning: 'MB_Sleep' is deprecated [-Wdeprecated-declarations]
+  MB_Sleep(buffer_ms);
+  ^~~~~~~~
+In file included from xil_testmem.c:49:
+microblaze_sleep.h:119:6: note: declared here
+ void MB_Sleep(u32 MilliSeconds) __attribute__((__deprecated__));
+      ^~~~~~~~
+xil_testmem.c:178:3: warning: 'MB_Sleep' is deprecated [-Wdeprecated-declarations]
+   MB_Sleep(30*1000);
+   ^~~~~~~~
+In file included from xil_testmem.c:49:
+microblaze_sleep.h:119:6: note: declared here
+ void MB_Sleep(u32 MilliSeconds) __attribute__((__deprecated__));
+      ^~~~~~~~
+xil_testmem.c:185:2: warning: 'MB_Sleep' is deprecated [-Wdeprecated-declarations]
+  MB_Sleep(wait_ms_temp);
+  ^~~~~~~~
+In file included from xil_testmem.c:49:
+microblaze_sleep.h:119:6: note: declared here
+ void MB_Sleep(u32 MilliSeconds) __attribute__((__deprecated__));
+      ^~~~~~~~
+xil_testmem.c:191:2: warning: 'MB_Sleep' is deprecated [-Wdeprecated-declarations]
+  MB_Sleep(buffer_ms);
+  ^~~~~~~~
+In file included from xil_testmem.c:49:
+microblaze_sleep.h:119:6: note: declared here
+ void MB_Sleep(u32 MilliSeconds) __attribute__((__deprecated__));
+      ^~~~~~~~
+xil_testmem.c: In function 'IK_ValidateMem8':
+xil_testmem.c:221:2: warning: 'MB_Sleep' is deprecated [-Wdeprecated-declarations]
+  MB_Sleep(Wait_ms);
+  ^~~~~~~~
+In file included from xil_testmem.c:49:
+microblaze_sleep.h:119:6: note: declared here
+ void MB_Sleep(u32 MilliSeconds) __attribute__((__deprecated__));
+      ^~~~~~~~
+xil_testmem.c:202:5: warning: variable 'FirtVal' set but not used [-Wunused-but-set-variable]
+  u8 FirtVal;
+     ^~~~~~~
+xil_testmem.c:200:6: warning: unused variable 'j' [-Wunused-variable]
+  u32 j;
+      ^
+xil_testmem.c:197:59: warning: unused parameter 'Pattern' [-Wunused-parameter]
+ unsigned long int IK_ValidateMem8(u8 *Addr, u32 Words, u8 Pattern, u8 Subtest, u32 Wait_ms)
+                                                        ~~~^~~~~~~
+In file included from mb_interface.h:49,
+                 from xil_io.h:64,
+                 from xil_testmem.c:47:
+xil_testmem.c: In function 'IK_TestMem32':
+xil_assert.h:133:16: warning: 'return' with a value, in function returning void
+         return 0;                                  \
+                ^
+xil_testmem.c:291:2: note: in expansion of macro 'Xil_AssertNonvoid'
+  Xil_AssertNonvoid(Words != (u32)0);
+  ^~~~~~~~~~~~~~~~~
+xil_testmem.c:281:6: note: declared here
+ void IK_TestMem32(u32 *Addr, u32 Words, u8 Pattern, u8 Subtest, u32 Wait_ms, u32 round)
+      ^~~~~~~~~~~~
+In file included from mb_interface.h:49,
+                 from xil_io.h:64,
+                 from xil_testmem.c:47:
+xil_assert.h:133:16: warning: 'return' with a value, in function returning void
+         return 0;                                  \
+                ^
+xil_testmem.c:292:2: note: in expansion of macro 'Xil_AssertNonvoid'
+  Xil_AssertNonvoid(Subtest <= XIL_TESTMEM_MAXTEST);
+  ^~~~~~~~~~~~~~~~~
+xil_testmem.c:281:6: note: declared here
+ void IK_TestMem32(u32 *Addr, u32 Words, u8 Pattern, u8 Subtest, u32 Wait_ms, u32 round)
+      ^~~~~~~~~~~~
+In file included from mb_interface.h:49,
+                 from xil_io.h:64,
+                 from xil_testmem.c:47:
+xil_assert.h:133:16: warning: 'return' with a value, in function returning void
+         return 0;                                  \
+                ^
+xil_testmem.c:293:2: note: in expansion of macro 'Xil_AssertNonvoid'
+  Xil_AssertNonvoid(Addr != NULL);
+  ^~~~~~~~~~~~~~~~~
+xil_testmem.c:281:6: note: declared here
+ void IK_TestMem32(u32 *Addr, u32 Words, u8 Pattern, u8 Subtest, u32 Wait_ms, u32 round)
+      ^~~~~~~~~~~~
+xil_testmem.c:298:6: warning: variable 'disabled_ms' set but not used [-Wunused-but-set-variable]
+  u64 disabled_ms;
+      ^~~~~~~~~~~
+xil_testmem.c:289:6: warning: variable 'Unfail_bitCount' set but not used [-Wunused-but-set-variable]
+  u64 Unfail_bitCount;
+      ^~~~~~~~~~~~~~~
+xil_testmem.c:284:6: warning: unused variable 'j' [-Wunused-variable]
+  u32 j;
+      ^
+xil_testmem.c:281:44: warning: unused parameter 'Pattern' [-Wunused-parameter]
+ void IK_TestMem32(u32 *Addr, u32 Words, u8 Pattern, u8 Subtest, u32 Wait_ms, u32 round)
+                                         ~~~^~~~~~~
+xil_testmem.c:281:82: warning: unused parameter 'round' [-Wunused-parameter]
+ void IK_TestMem32(u32 *Addr, u32 Words, u8 Pattern, u8 Subtest, u32 Wait_ms, u32 round)
+                                                                              ~~~~^~~~~
+In file included from mb_interface.h:49,
+                 from xil_io.h:64,
+                 from xil_testmem.c:47:
+xil_testmem.c: In function 'IK_TestMem64_FailCount':
+xil_assert.h:133:16: warning: 'return' with a value, in function returning void
+         return 0;                                  \
+                ^
+xil_testmem.c:402:2: note: in expansion of macro 'Xil_AssertNonvoid'
+  Xil_AssertNonvoid(Words != (u32)0);
+  ^~~~~~~~~~~~~~~~~
+xil_testmem.c:393:6: note: declared here
+ void IK_TestMem64_FailCount(u64 *Addr, u32 Words, u8 Subtest, u64 Wait_ms, retentionTestResult* result)
+      ^~~~~~~~~~~~~~~~~~~~~~
+In file included from mb_interface.h:49,
+                 from xil_io.h:64,
+                 from xil_testmem.c:47:
+xil_assert.h:133:16: warning: 'return' with a value, in function returning void
+         return 0;                                  \
+                ^
+xil_testmem.c:403:2: note: in expansion of macro 'Xil_AssertNonvoid'
+  Xil_AssertNonvoid(Subtest <= XIL_TESTMEM_MAXTEST);
+  ^~~~~~~~~~~~~~~~~
+xil_testmem.c:393:6: note: declared here
+ void IK_TestMem64_FailCount(u64 *Addr, u32 Words, u8 Subtest, u64 Wait_ms, retentionTestResult* result)
+      ^~~~~~~~~~~~~~~~~~~~~~
+In file included from mb_interface.h:49,
+                 from xil_io.h:64,
+                 from xil_testmem.c:47:
+xil_assert.h:133:16: warning: 'return' with a value, in function returning void
+         return 0;                                  \
+                ^
+xil_testmem.c:404:2: note: in expansion of macro 'Xil_AssertNonvoid'
+  Xil_AssertNonvoid(Addr != NULL);
+  ^~~~~~~~~~~~~~~~~
+xil_testmem.c:393:6: note: declared here
+ void IK_TestMem64_FailCount(u64 *Addr, u32 Words, u8 Subtest, u64 Wait_ms, retentionTestResult* result)
+      ^~~~~~~~~~~~~~~~~~~~~~
+xil_testmem.c:396:6: warning: unused variable 'j' [-Wunused-variable]
+  u32 j;
+      ^
+xil_testmem.c: In function 'IK_ValidateMem8':
+xil_testmem.c:279:1: warning: control reaches end of non-void function [-Wreturn-type]
+ }
+ ^
 microblaze_sleep.c:77:9: note: #pragma message: For the sleep routines, assembly instructions are used
  #pragma message ("For the sleep routines, assembly instructions are used")
          ^~~~~~~
@@ -48,5 +189,5 @@ make -C microblaze_0/libsrc/uartlite_v3_2/src -s libs  "SHELL=CMD" "COMPILER=mb-
 "Compiling uartlite"
 'Finished building libraries'
 
-20:01:55 Build Finished (took 5s.138ms)
+15:03:05 Build Finished (took 5s.230ms)
 
